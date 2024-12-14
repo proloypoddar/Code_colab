@@ -1,4 +1,6 @@
-#Siam Fire Detection
+#Siam Fire Detection under construction 🚧 
+
+#random testing 
 
 import cv2
 import numpy as np
@@ -15,4 +17,62 @@ while(live_Camera.isOpened()):
     plt.show()
 
 live_Camera.release()
+cv2.destroyAllWindows()
+
+
+
+
+
+#chatgpt testing 🤖 
+
+import cv2
+import numpy as np
+
+# Function to detect fire in the frame
+def detect_fire(frame):
+    # Convert the frame to HSV color space
+    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+    
+    # Define range for fire color in HSV
+    lower_fire = np.array([0, 150, 150])  # Lower range for fire
+    upper_fire = np.array([30, 255, 255])  # Upper range for fire
+    
+    # Create a mask for fire colors
+    mask = cv2.inRange(hsv, lower_fire, upper_fire)
+    
+    # Apply bitwise-AND to extract fire-colored regions
+    fire_detected = cv2.bitwise_and(frame, frame, mask=mask)
+    
+    # Find contours in the mask
+    contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    
+    # Draw rectangles around detected fire regions
+    for contour in contours:
+        if cv2.contourArea(contour) > 500:  # Adjust minimum size threshold for detection
+            x, y, w, h = cv2.boundingRect(contour)
+            cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 2)
+            cv2.putText(frame, "Fire Detected", (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+    
+    return frame
+
+# Access webcam
+cap = cv2.VideoCapture(0)  # 0 is the default webcam
+
+while True:
+    ret, frame = cap.read()  # Read frame from the webcam
+    if not ret:
+        break
+    
+    # Detect fire in the current frame
+    result_frame = detect_fire(frame)
+    
+    # Display the frame with fire detection
+    cv2.imshow("Fire Detection", result_frame)
+    
+    # Break loop on pressing 'q'
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+# Release resources
+cap.release()
 cv2.destroyAllWindows()
